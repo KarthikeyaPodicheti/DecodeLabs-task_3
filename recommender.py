@@ -3,48 +3,49 @@ from engine import build_tfidf_matrix, get_recommendations
 
 
 def main():
-    vectorizer, tfidf_matrix = build_tfidf_matrix(CATALOG)
+    # build the tfidf stuff once at startup — don't rebuild on every loop
+    vec, matrix = build_tfidf_matrix(CATALOG)
 
-    print("=" * 47)
-    print("DecodeLabs Project 3 — Movie Recommender")
-    print("=" * 47)
+    # welcome message
+    print("===============================================")
+    print("  DecodeLabs Project 3 - Movie Recommender")
+    print("===============================================")
+    print()
     print("Tell me what kind of movie you're in the mood for.")
-    print('Examples: "action hero adventure", "sad romantic drama", '
-          '"funny lighthearted family"')
+    print('For example: "action adventure" or "sad romance"')
     print()
 
     while True:
-        try:
-            user_input = input("What are you in the mood for? > ").strip()
-        except (EOFError, KeyboardInterrupt):
-            print("\nGoodbye! Happy watching :)")
-            break
 
-        if not user_input:
-            print("Please type at least one word describing your mood.")
+        # get the user's mood
+        mood = input("What are you in the mood for? > ").strip()
+
+        # if they hit enter without typing anything
+        if mood == "":
+            print("Oops, you gotta type something! Try again.")
             print()
             continue
 
-        recommendations = get_recommendations(
-            user_input, vectorizer, tfidf_matrix, CATALOG
-        )
+        # run the recommendations
+        recs = get_recommendations(mood, vec, matrix, CATALOG)
 
+        # display results
         print()
         print("Top 5 Picks For You:")
-        for i, rec in enumerate(recommendations, start=1):
-            print(f"{i}. {rec['title']} (score: {rec['score']})")
+        for num, movie in enumerate(recs, start=1):
+            print(f"{num}. {movie['title']} (score: {movie['score']})")
         print()
 
-        try:
-            again = input("Try again with different preferences? (yes/no) > ").strip().lower()
-        except (EOFError, KeyboardInterrupt):
-            print("\nGoodbye! Happy watching :)")
-            break
+        # ask if they wanna go again
+        again = input("Try again with different preferences? (yes/no) > ").strip().lower()
 
-        if again != "yes":
-            print("\nGoodbye! Happy watching :)")
+        if again == "yes":
+            print()
+            continue
+        else:
+            print()
+            print("Cool, hope you found something good! :)")
             break
-        print()
 
 
 if __name__ == "__main__":

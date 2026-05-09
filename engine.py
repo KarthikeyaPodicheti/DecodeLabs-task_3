@@ -3,45 +3,42 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 def build_tfidf_matrix(catalog):
-    """Fit a TF-IDF vectorizer on all item tags from the catalog.
-
-    Args:
-        catalog (list): List of dicts with a 'tags' key containing
-            space-separated keyword strings.
-
-    Returns:
-        tuple: (fitted TfidfVectorizer, TF-IDF matrix as sparse array)
     """
-    vectorizer = TfidfVectorizer(stop_words="english")
-    tag_texts = [item["tags"] for item in catalog]
-    tfidf_matrix = vectorizer.fit_transform(tag_texts)
-    return vectorizer, tfidf_matrix
-
-
-def get_recommendations(user_input, vectorizer, tfidf_matrix, catalog, top_n=5):
-    """Score every catalog item against the user's mood input using
-    TF-IDF + cosine similarity and return the top matches.
-
-    Args:
-        user_input (str): User's free-text mood or preference string.
-        vectorizer (TfidfVectorizer): Pre-fitted TfidfVectorizer instance.
-        tfidf_matrix (sparse matrix): TF-IDF vectors for all catalog items.
-        catalog (list): List of catalog dicts with 'title' and 'tags'.
-        top_n (int): Number of top recommendations to return.
-
-    Returns:
-        list: Top-N dicts, each with keys 'title', 'score', 'tags',
-            sorted by descending similarity score.
+    Takes the catalog and builds a TF-IDF matrix from the tags.
+    Returns the fitted vectorizer and the matrix so we can reuse them.
     """
-    user_vector = vectorizer.transform([user_input])
-    similarities = cosine_similarity(user_vector, tfidf_matrix).flatten()
-    ranked_indices = similarities.argsort()[::-1]
+    # grab all the tag strings from the catalog
+    tag_list = [movie["tags"] for movie in catalog]
 
+    # fit the vectorizer — stop_words removes stuff like "the", "a", etc.
+    vec = TfidfVectorizer(stop_words="english")
+    matrix = vec.fit_transform(tag_list)
+
+    return vec, matrix
+
+
+def get_recommendations(user_text, vec, tfidf_matrix, catalog, top_n=5):
+    """
+    Turns the user's text into a vector, compares it against every
+    movie using cosine similarity, and returns the top_n matches.
+    """
+    # vectorize the user's input using the SAME vectorizer
+    user_vec = vec.transform([user_text])
+
+    # compute similarity between user and ALL movies at once
+    scores = cosine_similarity(user_vec, tfidf_matrix).flatten()
+
+    # argsort gives us indices from lowest to highest,
+    # so [::-1] reverses it to get highest first
+    ranked = scores.argsort()[::-1]
+
+    # build the result list
     results = []
-    for idx in ranked_indices[:top_n]:
+    for i in ranked[:top_n]:
         results.append({
-            "title": catalog[idx]["title"],
-            "score": round(float(similarities[idx]), 2),
-            "tags": catalog[idx]["tags"],
+            "title": catalog[i]["title"],
+            "score": round(float(scores[i]), 2),
+            "tags": catalog[i]["tags"],
         })
+
     return results
