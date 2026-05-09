@@ -16,15 +16,56 @@ Third, `recommender.py` is the CLI. It shows a welcome banner, asks what you're 
 
 ## How to run it
 ```bash
-cd project3
 pip install -r requirements.txt
 python recommender.py
 ```
 
-```bash
-git add project3/
-git commit -m "feat: recommendation system - DecodeLabs Project 3"
-git push origin main
+## Example outputs
+Here's what it looks like when you run it with different inputs.
+
+**Input: "action hero adventure"**
+```
+Top 5 Picks For You:
+1. Toy Story (score: 0.24)
+2. Interstellar (score: 0.22)
+3. Spirited Away (score: 0.21)
+4. The Dark Knight (score: 0.19)
+5. Gladiator (score: 0.18)
+```
+
+**Input: "scary horror creepy"**
+```
+Top 5 Picks For You:
+1. The Conjuring (score: 0.66)
+2. Get Out (score: 0.16)
+3. Fight Club (score: 0.0)
+4. The Notebook (score: 0.0)
+5. Gladiator (score: 0.0)
+```
+
+**Input: "sad emotional romance"**
+```
+Top 5 Picks For You:
+1. La La Land (score: 0.44)
+2. The Notebook (score: 0.4)
+3. The Shawshank Redemption (score: 0.16)
+4. Forrest Gump (score: 0.14)
+5. Interstellar (score: 0.13)
+```
+
+**Input: "funny comedy"**
+```
+Top 5 Picks For You:
+1. Toy Story (score: 0.3)
+2. Parasite (score: 0.29)
+3. Pulp Fiction (score: 0.28)
+4. The Grand Budapest Hotel (score: 0.27)
+5. Fight Club (score: 0.0)
+```
+
+**Input: empty (just hit Enter)**
+```
+Please type at least one word describing your mood.
 ```
 
 ## What I actually learned
